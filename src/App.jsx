@@ -1,13 +1,13 @@
 // App principal - Router y layout
 // Punto de entrada de la aplicación
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ChatPage from './pages/ChatMultimodal';
 import ChatAdmin from './pages/ChatAdmin';
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Ruta principal del chat */}
         <Route path="/chat" element={<ChatPage />} />
@@ -21,7 +21,7 @@ function App() {
         {/* 404 */}
         <Route path="*" element={<Navigate to="/chat" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

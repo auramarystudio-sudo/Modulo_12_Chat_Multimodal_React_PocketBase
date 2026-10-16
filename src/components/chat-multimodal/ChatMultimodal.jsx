@@ -1,7 +1,7 @@
 // Componente principal del Chat Multimodal
 // Integra todos los subcomponentes y gestiona el estado de la conversación
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   Menu, Settings, Key, Image, Sparkles, 
   LogOut, Wifi, WifiOff 
@@ -15,7 +15,6 @@ import ProgressIndicator from './ProgressIndicator';
 import QuickGallery from './QuickGallery';
 import TokenManager from './TokenManager';
 import { procesarMensaje, crearContextoChat } from '../../utils/chat-engine';
-import { verificarConexion } from '../../utils/pocketbase';
 
 export default function ChatMultimodal({ authData, onLogout }) {
   // Estado de sesiones
@@ -58,12 +57,22 @@ export default function ChatMultimodal({ authData, onLogout }) {
     mensajesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes]);
 
-  // Verificar servicios al montar
+  // Verificar servicios al montar y crear sesión inicial
   useEffect(() => {
     verificarServicios();
     // Crear sesión inicial si no hay
-    if (sesiones.length === 0) {
-      crearNuevaSesion();
+    if (sesiones.length === 0 && !sesionActual) {
+      const nuevaSesion = {
+        id: `session_${Date.now()}`,
+        titulo: 'Nueva conversación',
+        modo_predeterminado: 'auto',
+        mensajes: [],
+        total_mensajes: 0,
+        ultima_actividad: new Date().toISOString(),
+        creado_en: new Date().toISOString()
+      };
+      setSesiones([nuevaSesion]);
+      setSesionActual(nuevaSesion);
     }
   }, []);
 
@@ -126,17 +135,32 @@ export default function ChatMultimodal({ authData, onLogout }) {
     }
   };
 
+  // Convertir archivo a base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   // Enviar mensaje
-  const enviarMensaje = useCallback(async (texto, archivo = null) => {
+  const enviarMensaje = async (texto, archivo = null) => {
     if (!texto && !archivo) return;
     
     // Mensaje del usuario
+    let imagenAdjunta = null;
+    if (archivo) {
+      imagenAdjunta = await fileToBase64(archivo);
+    }
+    
     const mensajeUsuario = {
       id: `msg_${Date.now()}`,
       tipo: 'texto_usuario',
       rol: 'usuario',
       contenido: texto || '(imagen adjunta)',
-      imagen_adjunta: archivo ? await fileToBase64(archivo) : null,
+      imagen_adjunta: imagenAdjunta,
       timestamp: new Date().toISOString()
     };
 
@@ -205,7 +229,7 @@ export default function ChatMultimodal({ authData, onLogout }) {
       setProgreso(null);
       archivoAdjuntoRef.current = null;
     }
-  }, [mensajes, modoActual, config, sesionActual]);
+  };
 
   // Actualizar sesión con nuevos mensajes
   const actualizarSesion = (nuevosMensajes) => {
@@ -268,16 +292,6 @@ export default function ChatMultimodal({ authData, onLogout }) {
       case 'texto': return 'Pensando...';
       default: return 'Procesando...';
     }
-  };
-
-  // Convertir archivo a base64
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   };
 
   // Modos permitidos según token

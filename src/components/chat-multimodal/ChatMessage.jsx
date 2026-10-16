@@ -121,8 +121,8 @@ export default function ChatMessage({ mensaje, onAction }) {
                 />
               </div>
             )}
-            <div className="text-sm text-slate-200 whitespace-pre-wrap prose-sm">
-              <FormattedContent content={contenido} />
+            <div className="text-sm text-slate-200 whitespace-pre-wrap">
+              {contenido}
             </div>
             {/* Metadata */}
             <div className="mt-3 flex flex-wrap gap-2">
@@ -154,7 +154,7 @@ export default function ChatMessage({ mensaje, onAction }) {
       <div className="flex-1 max-w-[85%]">
         <div className="bg-slate-800/50 border border-slate-700/30 rounded-2xl rounded-tl-sm p-4">
           <div className="text-sm text-slate-200 whitespace-pre-wrap">
-            <FormattedContent content={contenido} />
+            {contenido}
           </div>
           {/* Metadata */}
           <div className="mt-2 flex flex-wrap gap-2">
@@ -181,89 +181,4 @@ export default function ChatMessage({ mensaje, onAction }) {
       </div>
     </div>
   );
-}
-
-/**
- * Componente para renderizar contenido con formato Markdown básico
- */
-function FormattedContent({ content }) {
-  if (!content) return null;
-
-  // Parseo básico de Markdown
-  const lines = content.split('\n');
-  const elements = [];
-  let inCodeBlock = false;
-  let codeContent = [];
-
-  lines.forEach((line, i) => {
-    if (line.startsWith('```')) {
-      if (inCodeBlock) {
-        elements.push(
-          <pre key={i} className="bg-slate-950/50 rounded-lg p-3 my-2 overflow-x-auto border border-slate-700/30">
-            <code className="text-xs text-green-300 font-mono">{codeContent.join('\n')}</code>
-          </pre>
-        );
-        codeContent = [];
-        inCodeBlock = false;
-      } else {
-        inCodeBlock = true;
-      }
-      return;
-    }
-
-    if (inCodeBlock) {
-      codeContent.push(line);
-      return;
-    }
-
-    // Headers
-    if (line.startsWith('### ')) {
-      elements.push(<h3 key={i} className="text-base font-bold text-slate-100 mt-2 mb-1">{renderInline(line.slice(4))}</h3>);
-    } else if (line.startsWith('## ')) {
-      elements.push(<h2 key={i} className="text-lg font-bold text-slate-100 mt-2 mb-1">{renderInline(line.slice(3))}</h2>);
-    } else if (line.startsWith('# ')) {
-      elements.push(<h1 key={i} className="text-xl font-bold text-slate-100 mt-2 mb-1">{renderInline(line.slice(2))}</h1>);
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      elements.push(
-        <div key={i} className="flex gap-2 ml-2 my-0.5">
-          <span className="text-cyan-400">•</span>
-          <span>{renderInline(line.slice(2))}</span>
-        </div>
-      );
-    } else if (line.trim() === '') {
-      elements.push(<br key={i} />);
-    } else {
-      elements.push(<span key={i}>{renderInline(line)}{'\n'}</span>);
-    }
-  });
-
-  return <>{elements}</>;
-}
-
-/**
- * Renderiza formato inline (bold, italic, code)
- */
-function renderInline(text) {
-  // Code inline
-  const parts = text.split(/(`[^`]+`)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="bg-slate-950/50 px-1.5 py-0.5 rounded text-xs text-cyan-300 font-mono">{part.slice(1, -1)}</code>;
-    }
-    // Bold
-    const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
-    return boldParts.map((bp, j) => {
-      if (bp.startsWith('**') && bp.endsWith('**')) {
-        return <strong key={`${i}-${j}`} className="font-semibold text-slate-100">{bp.slice(2, -2)}</strong>;
-      }
-      // Italic
-      const italicParts = bp.split(/(\*[^*]+\*)/g);
-      return italicParts.map((ip, k) => {
-        if (ip.startsWith('*') && ip.endsWith('*') && !ip.startsWith('**')) {
-          return <em key={`${i}-${j}-${k}`} className="italic text-slate-300">{ip.slice(1, -1)}</em>;
-        }
-        return <span key={`${i}-${j}-${k}`}>{ip}</span>;
-      });
-    });
-  });
 }
