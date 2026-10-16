@@ -197,10 +197,12 @@ function generatePlaceholderSVG(prompt) {
       </linearGradient>
     </defs>
     <rect width="512" height="512" fill="url(#g)"/>
-    <text x="256" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">🎨 Imagen Simulada</text>
+    <text x="256" y="240" text-anchor="middle" fill="#94a3b8" font-size="14" font-family="sans-serif">Imagen Simulada</text>
     <text x="256" y="270" text-anchor="middle" fill="#64748b" font-size="11" font-family="sans-serif">${shortPrompt}</text>
     <text x="256" y="300" text-anchor="middle" fill="#475569" font-size="10" font-family="sans-serif">A1111 no disponible</text>
   </svg>`;
   
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
+  // Codificar UTF-8 correctamente para btoa (que solo acepta Latin1)
+  const encoded = btoa(unescape(encodeURIComponent(svg)));
+  return `data:image/svg+xml;base64,${encoded}`;
 }
