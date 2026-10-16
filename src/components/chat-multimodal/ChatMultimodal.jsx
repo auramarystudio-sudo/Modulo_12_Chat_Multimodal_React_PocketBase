@@ -14,6 +14,7 @@ import ModeSelector from './ModeSelector';
 import ProgressIndicator from './ProgressIndicator';
 import QuickGallery from './QuickGallery';
 import TokenManager from './TokenManager';
+import ModelSelector from './ModelSelector';
 import { procesarMensaje, crearContextoChat } from '../../utils/chat-engine';
 
 export default function ChatMultimodal({ authData, onLogout }) {
@@ -318,11 +319,18 @@ export default function ChatMultimodal({ authData, onLogout }) {
             </div>
           </div>
 
-          {/* Center - Status */}
-          <div className="hidden md:flex items-center gap-2">
-            <StatusBadge activo={servicios.ollama} label="Ollama" />
-            <StatusBadge activo={servicios.a1111} label="A1111" />
-            <StatusBadge activo={servicios.comfyui} label="ComfyUI" />
+          {/* Center - Model Selector */}
+          <div className="flex items-center gap-2">
+            <ModelSelector 
+              config={config} 
+              onUpdate={setConfig} 
+              servicios={servicios} 
+            />
+            <div className="hidden lg:flex items-center gap-1">
+              <StatusBadge activo={servicios.ollama} label="Ollama" />
+              <StatusBadge activo={servicios.a1111} label="A1111" />
+              <StatusBadge activo={servicios.comfyui} label="ComfyUI" />
+            </div>
           </div>
 
           {/* Right */}
