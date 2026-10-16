@@ -1,14 +1,14 @@
-// Componente principal del Chat Multimodal
-// Integra todos los subcomponentes y gestiona el estado de la conversación
+// Componente principal del Chat Multimodal - Mobile First
+// Diseño optimizado para uso en teléfono
 
 import { useState, useRef, useEffect } from 'react';
 import { 
   Menu, Settings, Key, Image, Sparkles, 
-  LogOut, Wifi, WifiOff 
+  LogOut, MessageSquare, Plus, X
 } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import ChatSidebar from './ChatSidebar';
+import ConversationsMenu from './ConversationsMenu';
 import ChatSettings from './ChatSettings';
 import ModeSelector from './ModeSelector';
 import ProgressIndicator from './ProgressIndicator';
@@ -24,7 +24,7 @@ export default function ChatMultimodal({ authData, onLogout }) {
   const [mensajes, setMensajes] = useState([]);
   
   // Estado de UI
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [conversationsOpen, setConversationsOpen] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [tokenManagerVisible, setTokenManagerVisible] = useState(false);
@@ -113,14 +113,14 @@ export default function ChatMultimodal({ authData, onLogout }) {
     setSesiones(prev => [nuevaSesion, ...prev]);
     setSesionActual(nuevaSesion);
     setMensajes([]);
-    setSidebarVisible(false);
+    setConversationsOpen(false);
   };
 
   // Seleccionar sesión
   const seleccionarSesion = (sesion) => {
     setSesionActual(sesion);
     setMensajes(sesion.mensajes || []);
-    setSidebarVisible(false);
+    setConversationsOpen(false);
   };
 
   // Eliminar sesión
@@ -256,12 +256,10 @@ export default function ChatMultimodal({ authData, onLogout }) {
   const handleMensajeAction = (accion, mensaje) => {
     switch (accion) {
       case 'regenerar':
-        // Encontrar el mensaje de usuario anterior y regenerar
         const idx = mensajes.findIndex(m => m.id === mensaje.id);
         if (idx > 0) {
           const mensajeUsuarioAnterior = mensajes[idx - 1];
           if (mensajeUsuarioAnterior.rol === 'usuario') {
-            // Eliminar la respuesta actual y regenerar
             const mensajesSinRespuesta = mensajes.slice(0, idx);
             setMensajes(mensajesSinRespuesta);
             enviarMensaje(mensajeUsuarioAnterior.contenido);
@@ -269,13 +267,11 @@ export default function ChatMultimodal({ authData, onLogout }) {
         }
         break;
       case 'favorito':
-        // Toggle favorito
         setMensajes(prev => prev.map(m => 
           m.id === mensaje.id ? { ...m, favorito: !m.favorito } : m
         ));
         break;
       case 'reintentar':
-        // Reintentar último mensaje
         const ultimoUsuario = [...mensajes].reverse().find(m => m.rol === 'usuario');
         if (ultimoUsuario) {
           enviarMensaje(ultimoUsuario.contenido);
@@ -299,69 +295,41 @@ export default function ChatMultimodal({ authData, onLogout }) {
   const modosPermitidos = authData?.data?.modos_permitidos || null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col">
-      {/* Header flotante */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col h-screen">
+      {/* Header compacto mobile-first */}
       <header className="border-b border-slate-800/50 bg-slate-900/90 backdrop-blur-xl sticky top-0 z-20 shadow-lg">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Left */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarVisible(true)}
-              className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-cyan-400" />
-              <h1 className="text-sm font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent hidden sm:block">
-                Chat IA Multimodal
-              </h1>
-            </div>
-          </div>
+        <div className="flex items-center justify-between px-3 py-2">
+          {/* Left - Conversations button */}
+          <button
+            onClick={() => setConversationsOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-300 hover:text-white transition active:scale-95"
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span className="text-xs font-medium hidden sm:inline">Chats</span>
+          </button>
 
           {/* Center - Model Selector */}
-          <div className="flex items-center gap-2">
-            <ModelSelector 
-              config={config} 
-              onUpdate={setConfig} 
-              servicios={servicios} 
-            />
-            <div className="hidden lg:flex items-center gap-1">
-              <StatusBadge activo={servicios.ollama} label="Ollama" />
-              <StatusBadge activo={servicios.a1111} label="A1111" />
-              <StatusBadge activo={servicios.comfyui} label="ComfyUI" />
-            </div>
-          </div>
+          <ModelSelector 
+            config={config} 
+            onUpdate={setConfig} 
+            servicios={servicios} 
+          />
 
-          {/* Right */}
-          <div className="flex items-center gap-2">
+          {/* Right - Actions */}
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setGalleryVisible(true)}
-              className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-95"
               title="Galería"
             >
               <Image className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setTokenManagerVisible(true)}
-              className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition"
-              title="Tokens"
-            >
-              <Key className="w-5 h-5" />
-            </button>
-            <button
               onClick={() => setSettingsVisible(true)}
-              className="p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-95"
               title="Configuración"
             >
               <Settings className="w-5 h-5" />
-            </button>
-            <button
-              onClick={onLogout}
-              className="p-2 rounded-lg bg-slate-800/50 hover:bg-red-900/30 text-slate-400 hover:text-red-400 transition"
-              title="Cerrar sesión"
-            >
-              <LogOut className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -370,20 +338,20 @@ export default function ChatMultimodal({ authData, onLogout }) {
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Área de mensajes */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-3 py-3">
           {/* Mensaje de bienvenida si está vacío */}
           {mensajes.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600/20 to-purple-600/20 border border-slate-700/30 flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-cyan-400" />
+            <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in px-4">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-cyan-600/20 to-purple-600/20 border border-slate-700/30 flex items-center justify-center mb-6">
+                <Sparkles className="w-10 h-10 text-cyan-400" />
               </div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-3">
                 ¡Hola! Soy tu asistente IA
               </h2>
-              <p className="text-sm text-slate-400 max-w-sm mb-6">
-                Puedo conversar contigo, generar imágenes, crear videos y analizar fotos. ¿Qué te gustaría hacer?
+              <p className="text-sm text-slate-400 max-w-sm mb-8">
+                Puedo conversar, generar imágenes, crear videos y analizar fotos. ¿Qué te gustaría hacer?
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-md w-full">
+              <div className="grid grid-cols-1 gap-3 w-full max-w-sm">
                 <SugerenciaButton
                   texto="💬 Cuéntame sobre Stable Diffusion"
                   onClick={() => enviarMensaje('Cuéntame sobre Stable Diffusion')}
@@ -424,7 +392,7 @@ export default function ChatMultimodal({ authData, onLogout }) {
         </div>
 
         {/* Selector de modo */}
-        <div className="px-4 pt-2">
+        <div className="px-3 pt-2 pb-1">
           <ModeSelector
             modoActual={modoActual}
             onModoChange={setModoActual}
@@ -432,7 +400,7 @@ export default function ChatMultimodal({ authData, onLogout }) {
           />
         </div>
 
-        {/* Input */}
+        {/* Input optimizado para móvil */}
         <ChatInput
           onSend={enviarMensaje}
           cargando={cargando}
@@ -440,15 +408,20 @@ export default function ChatMultimodal({ authData, onLogout }) {
         />
       </div>
 
-      {/* Paneles laterales */}
-      <ChatSidebar
+      {/* Menú de conversaciones (Bottom Sheet en móvil) */}
+      <ConversationsMenu
         sesiones={sesiones}
         sesionActual={sesionActual}
+        visible={conversationsOpen}
+        onClose={() => setConversationsOpen(false)}
         onSelectSesion={seleccionarSesion}
         onNuevaSesion={crearNuevaSesion}
         onEliminarSesion={eliminarSesion}
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
+        onTokens={() => {
+          setConversationsOpen(false);
+          setTokenManagerVisible(true);
+        }}
+        onLogout={onLogout}
       />
 
       <ChatSettings
@@ -463,7 +436,6 @@ export default function ChatMultimodal({ authData, onLogout }) {
         visible={galleryVisible}
         onClose={() => setGalleryVisible(false)}
         onSelect={(img) => {
-          // Usar imagen para img2img o análisis
           enviarMensaje('Usa esta imagen como referencia');
         }}
       />
@@ -478,8 +450,8 @@ export default function ChatMultimodal({ authData, onLogout }) {
 
       {/* Info demo */}
       {authData?.demo && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-950/50 border border-amber-800/30 text-xs text-amber-300 z-10">
-          ⚠️ Modo Demo - Servicios no conectados
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-amber-950/50 border border-amber-800/30 text-xs text-amber-300 z-10">
+          ⚠️ Modo Demo
         </div>
       )}
     </div>
@@ -487,29 +459,13 @@ export default function ChatMultimodal({ authData, onLogout }) {
 }
 
 /**
- * Badge de estado de servicio
- */
-function StatusBadge({ activo, label }) {
-  return (
-    <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
-      activo 
-        ? 'bg-green-950/50 text-green-400 border border-green-800/30' 
-        : 'bg-slate-800/50 text-slate-500 border border-slate-700/30'
-    }`}>
-      {activo ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-      {label}
-    </div>
-  );
-}
-
-/**
- * Botón de sugerencia
+ * Botón de sugerencia - Optimizado para móvil
  */
 function SugerenciaButton({ texto, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="text-left px-3 py-2.5 rounded-lg bg-slate-800/30 border border-slate-700/30 hover:bg-slate-800/50 hover:border-slate-600/50 text-sm text-slate-300 transition"
+      className="w-full text-left px-4 py-3.5 rounded-xl bg-slate-800/30 border border-slate-700/30 hover:bg-slate-800/50 hover:border-slate-600/50 text-sm text-slate-300 transition active:scale-95"
     >
       {texto}
     </button>

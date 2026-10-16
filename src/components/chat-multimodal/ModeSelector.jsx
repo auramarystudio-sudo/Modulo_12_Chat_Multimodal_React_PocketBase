@@ -1,14 +1,14 @@
-// Selector de Modo del Chat
-// Permite elegir entre Auto, Texto, Imagen, Video, Análisis
+// Selector de Modo del Chat - Optimizado para móvil
+// Botones grandes y táctiles
 
 import { Sparkles, MessageSquare, Image, Video, Eye } from 'lucide-react';
 
 const MODOS = [
-  { id: 'auto', nombre: 'Auto', icono: Sparkles, color: 'from-cyan-500 to-purple-500' },
-  { id: 'texto', nombre: 'Texto', icono: MessageSquare, color: 'from-blue-500 to-cyan-500' },
-  { id: 'imagen', nombre: 'Imagen', icono: Image, color: 'from-pink-500 to-purple-500' },
-  { id: 'video', nombre: 'Video', icono: Video, color: 'from-orange-500 to-red-500' },
-  { id: 'analisis', nombre: 'Análisis', icono: Eye, color: 'from-green-500 to-emerald-500' },
+  { id: 'auto', nombre: 'Auto', emoji: '✨', icono: Sparkles, color: 'cyan' },
+  { id: 'texto', nombre: 'Texto', emoji: '💬', icono: MessageSquare, color: 'blue' },
+  { id: 'imagen', nombre: 'Imagen', emoji: '🎨', icono: Image, color: 'pink' },
+  { id: 'video', nombre: 'Video', emoji: '🎬', icono: Video, color: 'orange' },
+  { id: 'analisis', nombre: 'Análisis', emoji: '🖼️', icono: Eye, color: 'green' },
 ];
 
 export default function ModeSelector({ modoActual, onModoChange, modosPermitidos = null }) {
@@ -17,9 +17,8 @@ export default function ModeSelector({ modoActual, onModoChange, modosPermitidos
     : MODOS;
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto pb-1 px-1 scrollbar-hide">
+    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 px-1 scrollbar-hide">
       {modosFiltrados.map((modo) => {
-        const Icono = modo.icono;
         const activo = modoActual === modo.id;
         
         return (
@@ -27,15 +26,14 @@ export default function ModeSelector({ modoActual, onModoChange, modosPermitidos
             key={modo.id}
             onClick={() => onModoChange(modo.id)}
             className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap
+              flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap active:scale-95
               ${activo 
                 ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 shadow-sm' 
                 : 'bg-slate-800/30 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
               }
             `}
-            title={modo.nombre}
           >
-            <Icono className="w-3.5 h-3.5" />
+            <span className="text-sm">{modo.emoji}</span>
             <span className="hidden sm:inline">{modo.nombre}</span>
           </button>
         );

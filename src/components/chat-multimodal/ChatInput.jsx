@@ -1,8 +1,8 @@
-// Input de mensaje del chat
-// Incluye campo de texto, botón de enviar, y botón de adjuntar archivo
+// Input de mensaje del chat - Optimizado para móvil
+// Botones grandes, área táctil amplia, feedback visual
 
 import { useState, useRef } from 'react';
-import { Send, Paperclip, X, Image as ImageIcon } from 'lucide-react';
+import { Send, Paperclip, X, Mic } from 'lucide-react';
 
 export default function ChatInput({ onSend, cargando, modoActual }) {
   const [mensaje, setMensaje] = useState('');
@@ -12,7 +12,7 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
   const textareaRef = useRef(null);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if ((!mensaje.trim() && !archivo) || cargando) return;
     
     onSend(mensaje.trim(), archivo);
@@ -27,9 +27,10 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // En móvil no usar Enter para enviar (conflictos con teclado)
+    if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit();
     }
   };
 
@@ -80,35 +81,35 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
   };
 
   return (
-    <div className="border-t border-slate-800/50 bg-slate-900/90 backdrop-blur-xl p-3">
+    <div className="border-t border-slate-800/50 bg-slate-900/95 backdrop-blur-xl pb-safe">
       {/* Preview de archivo adjunto */}
       {previewUrl && (
-        <div className="mb-2 flex items-center gap-2 animate-fade-in">
-          <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-700/50">
+        <div className="flex items-center gap-3 p-3 border-b border-slate-800/30 animate-fade-in">
+          <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-700/50 flex-shrink-0">
             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-slate-300 truncate">{archivo?.name}</p>
+            <p className="text-sm text-slate-200 truncate">{archivo?.name}</p>
             <p className="text-xs text-slate-500">
               {(archivo?.size / 1024).toFixed(1)} KB
             </p>
           </div>
           <button
             onClick={removeFile}
-            className="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-red-400 transition"
+            className="p-2.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-red-400 transition active:scale-90"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
       )}
 
-      {/* Formulario de input */}
-      <form onSubmit={handleSubmit} className="flex items-end gap-2">
-        {/* Botón adjuntar */}
+      {/* Input principal */}
+      <div className="flex items-end gap-2 p-3">
+        {/* Botón adjuntar - Grande y táctil */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition flex-shrink-0"
+          className="p-3.5 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition flex-shrink-0 active:scale-90 border border-slate-700/30"
           title="Adjuntar imagen"
         >
           <Paperclip className="w-5 h-5" />
@@ -121,7 +122,7 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
           className="hidden"
         />
 
-        {/* Campo de texto */}
+        {/* Campo de texto - Más grande para móvil */}
         <div className="flex-1 relative">
           <textarea
             ref={textareaRef}
@@ -130,16 +131,16 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
             onKeyDown={handleKeyDown}
             placeholder={getPlaceholder()}
             rows={1}
-            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition resize-none text-sm"
+            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition resize-none text-base leading-relaxed"
             disabled={cargando}
           />
         </div>
 
-        {/* Botón enviar */}
+        {/* Botón enviar - Grande y prominente */}
         <button
-          type="submit"
+          onClick={() => handleSubmit()}
           disabled={(!mensaje.trim() && !archivo) || cargando}
-          className="p-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition shadow-lg flex-shrink-0 disabled:opacity-30 disabled:hover:bg-cyan-600"
+          className="p-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition shadow-lg flex-shrink-0 disabled:opacity-30 disabled:hover:bg-cyan-600 active:scale-90 border border-cyan-500/30"
         >
           {cargando ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -147,18 +148,18 @@ export default function ChatInput({ onSend, cargando, modoActual }) {
             <Send className="w-5 h-5" />
           )}
         </button>
-      </form>
+      </div>
 
       {/* Indicador de modo actual */}
-      <div className="flex items-center justify-between mt-2 px-1">
+      <div className="flex items-center justify-between px-4 pb-2">
         <span className="text-xs text-slate-500">
-          {modoActual === 'auto' ? '✨ Detección automática' : 
-           modoActual === 'texto' ? '💬 Modo texto' :
-           modoActual === 'imagen' ? '🎨 Modo imagen' :
-           modoActual === 'video' ? '🎬 Modo video' :
-           '🖼️ Modo análisis'}
+          {modoActual === 'auto' ? '✨ Auto' : 
+           modoActual === 'texto' ? '💬 Texto' :
+           modoActual === 'imagen' ? '🎨 Imagen' :
+           modoActual === 'video' ? '🎬 Video' :
+           '🖼️ Análisis'}
         </span>
-        <span className="text-xs text-slate-600">
+        <span className="text-xs text-slate-600 hidden sm:block">
           Enter para enviar
         </span>
       </div>

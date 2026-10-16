@@ -75,26 +75,31 @@ export default function ChatSettings({ config, onUpdate, visible, onClose }) {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={onClose} />
       
-      {/* Panel */}
-      <div className="fixed right-0 top-0 bottom-0 w-80 bg-slate-900/95 backdrop-blur-xl border-l border-slate-800/50 z-50 flex flex-col shadow-xl animate-fade-in">
+      {/* Panel - Bottom sheet en móvil, Drawer en desktop */}
+      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:left-auto md:right-0 md:w-80 bg-slate-900/98 backdrop-blur-xl md:border-l border-t md:border-t-0 border-slate-800/50 z-50 flex flex-col shadow-2xl rounded-t-3xl md:rounded-t-none max-h-[85vh] md:max-h-full animate-slide-up">
+        {/* Handle para arrastrar (solo móvil) */}
+        <div className="md:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-slate-600" />
+        </div>
+
         {/* Header */}
-        <div className="p-4 border-b border-slate-800/50 flex items-center justify-between">
+        <div className="px-4 pt-2 pb-3 border-b border-slate-800/50 flex items-center justify-between">
           <h2 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
             Configuración
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={cargarModelos}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-90"
               title="Refrescar modelos"
             >
               <RefreshCw className={`w-4 h-4 ${cargando ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition"
+              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition active:scale-90"
             >
               <X className="w-5 h-5" />
             </button>
@@ -376,10 +381,10 @@ export default function ChatSettings({ config, onUpdate, visible, onClose }) {
         </div>
 
         {/* Footer con botón guardar */}
-        <div className="p-4 border-t border-slate-800/50">
+        <div className="p-4 border-t border-slate-800/50 pb-safe">
           <button
             onClick={handleSave}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition shadow-lg"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white font-medium transition shadow-lg active:scale-95"
           >
             <Settings className="w-4 h-4" />
             Guardar configuración
