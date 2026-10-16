@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* Glassmorphism Dark Pro v3.0 - Variables personalizadas */
+:root {
+  --color-primary: #06b6d4;
+  --color-secondary: #8b5cf6;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+}
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; }
+  30% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+.typing-dot:nth-child(1) { animation: typing 1.4s infinite 0s; }
+.typing-dot:nth-child(2) { animation: typing 1.4s infinite 0.2s; }
+.typing-dot:nth-child(3) { animation: typing 1.4s infinite 0.4s; }
+
+/* Mobile optimizations */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+.active\:scale-90:active {
+  transform: scale(0.90);
+}
