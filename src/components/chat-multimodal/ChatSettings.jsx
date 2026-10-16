@@ -2,6 +2,7 @@
 // Permite ajustar modelos y parámetros con detección automática
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Settings, X, Cpu, Image, Video, Eye, RefreshCw, Wifi, WifiOff, Download } from 'lucide-react';
 
 export default function ChatSettings({ config, onUpdate, visible, onClose }) {
@@ -72,13 +73,13 @@ export default function ChatSettings({ config, onUpdate, visible, onClose }) {
     m.name.includes('minicpm') || m.name.includes('vision')
   );
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]" onClick={onClose} />
       
       {/* Panel - Bottom sheet en móvil, Drawer en desktop */}
-      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:left-auto md:right-0 md:w-80 bg-slate-900/98 backdrop-blur-xl md:border-l border-t md:border-t-0 border-slate-800/50 z-50 flex flex-col shadow-2xl rounded-t-3xl md:rounded-t-none max-h-[85vh] md:max-h-full animate-slide-up">
+      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:left-auto md:right-0 md:w-80 bg-slate-900/98 backdrop-blur-xl md:border-l border-t md:border-t-0 border-slate-800/50 z-[9999] flex flex-col shadow-2xl rounded-t-3xl md:rounded-t-none max-h-[85vh] md:max-h-full animate-slide-up">
         {/* Handle para arrastrar (solo móvil) */}
         <div className="md:hidden flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-slate-600" />
@@ -391,7 +392,8 @@ export default function ChatSettings({ config, onUpdate, visible, onClose }) {
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

@@ -1,12 +1,13 @@
 // Galería rápida de imágenes generadas
 // Muestra miniaturas de las últimas imágenes para reutilizar
 
+import { createPortal } from 'react-dom';
 import { Image, X } from 'lucide-react';
 
 export default function QuickGallery({ imagenes, visible, onClose, onSelect }) {
   if (!visible || imagenes.length === 0) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
@@ -57,6 +58,7 @@ export default function QuickGallery({ imagenes, visible, onClose, onSelect }) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

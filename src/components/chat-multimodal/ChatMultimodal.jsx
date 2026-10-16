@@ -295,7 +295,7 @@ export default function ChatMultimodal({ authData, onLogout }) {
   const modosPermitidos = authData?.data?.modos_permitidos || null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col h-screen relative overflow-visible">
       {/* Header compacto mobile-first */}
       <header className="border-b border-slate-800/50 bg-slate-900/90 backdrop-blur-xl sticky top-0 z-20 shadow-lg">
         <div className="flex items-center justify-between px-3 py-2">

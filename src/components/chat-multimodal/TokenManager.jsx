@@ -2,6 +2,7 @@
 // Permite crear, ver y eliminar tokens de acceso
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Key, Plus, Trash2, Copy, Check, Shield, X } from 'lucide-react';
 import { generarToken, crearConfigToken } from '../../utils/token-manager';
 
@@ -42,13 +43,13 @@ export default function TokenManager({ tokens, onCrearToken, onEliminarToken, vi
     );
   };
 
-  return (
+  return createPortal(
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]" onClick={onClose} />
       
       {/* Panel */}
-      <div className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:max-h-[80vh] bg-slate-900/95 backdrop-blur-xl border border-slate-800/50 rounded-2xl z-50 flex flex-col shadow-2xl animate-fade-in">
+      <div className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:max-h-[80vh] bg-slate-900/95 backdrop-blur-xl border border-slate-800/50 rounded-2xl z-[9999] flex flex-col shadow-2xl animate-fade-in">
         {/* Header */}
         <div className="p-4 border-b border-slate-800/50 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -185,6 +186,7 @@ export default function TokenManager({ tokens, onCrearToken, onEliminarToken, vi
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

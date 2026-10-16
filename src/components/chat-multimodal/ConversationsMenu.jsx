@@ -1,10 +1,11 @@
-// Menú de Conversaciones - Bottom Sheet en móvil, Drawer en desktop
-// Optimizado para uso táctil en teléfono
+// Menú de Conversaciones - Usa Portal para funcionar en cualquier contexto
+// Funciona tanto standalone como dentro de contenedores con sidebar
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Plus, MessageSquare, Trash2, Clock, X, 
-  ChevronLeft, Key, LogOut, Sparkles, GripVertical
+  Key, LogOut, Sparkles
 } from 'lucide-react';
 
 export default function ConversationsMenu({ 
@@ -33,16 +34,18 @@ export default function ConversationsMenu({
     }
   };
 
-  return (
+  // Usar Portal para renderizar fuera del contenedor padre
+  // Esto garantiza que funcione sin importar overflow/transform del padre
+  const menuContent = (
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] animate-fade-in"
         onClick={onClose}
       />
       
       {/* Bottom Sheet (móvil) / Drawer (desktop) */}
-      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:left-0 md:w-80 bg-slate-900/98 backdrop-blur-xl md:border-r border-t md:border-t-0 border-slate-800/50 z-50 flex flex-col shadow-2xl rounded-t-3xl md:rounded-t-none md:rounded-none animate-slide-up">
+      <div className="fixed inset-x-0 bottom-0 md:inset-y-0 md:inset-x-auto md:left-0 md:w-80 bg-slate-900/98 backdrop-blur-xl md:border-r border-t md:border-t-0 border-slate-800/50 z-[9999] flex flex-col shadow-2xl rounded-t-3xl md:rounded-t-none md:rounded-none animate-slide-up max-h-[90vh] md:max-h-full">
         
         {/* Handle para arrastrar (solo móvil) */}
         <div className="md:hidden flex justify-center pt-3 pb-1">
@@ -66,7 +69,7 @@ export default function ConversationsMenu({
             </button>
           </div>
           
-          {/* Botón nueva conversación - Grande y táctil */}
+          {/* Botón nueva conversación */}
           <button
             onClick={onNuevaSesion}
             className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white font-medium transition shadow-lg active:scale-95"
@@ -77,7 +80,7 @@ export default function ConversationsMenu({
         </div>
 
         {/* Lista de sesiones */}
-        <div className="flex-1 overflow-y-auto p-3 -webkit-overflow-scrolling-touch">
+        <div className="flex-1 overflow-y-auto p-3 overscroll-contain">
           {sesiones.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquare className="w-12 h-12 text-slate-700 mx-auto mb-3" />
@@ -120,10 +123,13 @@ export default function ConversationsMenu({
       </div>
     </>
   );
+
+  // Renderizar mediante Portal al body
+  return createPortal(menuContent, document.body);
 }
 
 /**
- * Item individual de sesión - Optimizado para touch
+ * Item individual de sesión
  */
 function SesionItem({ sesion, activa, eliminando, onSelect, onEliminar }) {
   return (
@@ -160,7 +166,7 @@ function SesionItem({ sesion, activa, eliminando, onSelect, onEliminar }) {
         </div>
       </div>
 
-      {/* Botón eliminar - Doble tap para confirmar */}
+      {/* Botón eliminar */}
       <button
         onClick={onEliminar}
         className={`p-2 rounded-lg transition active:scale-90 ${
